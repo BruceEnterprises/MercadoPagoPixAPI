@@ -20,4 +20,6 @@ dependencies {
     testImplementation(libs.kotlin.test.junit)
 
     implementation("com.mercadopago:sdk-java:2.1.29")
+    implementation("io.ktor:ktor-server-content-negotiation:2.0.3")
+    implementation("io.ktor:ktor-serialization-gson:2.0.3")
 }
