@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
+    kotlin("plugin.serialization") version "1.9.20"
 }
 
 kotlin {
@@ -29,31 +30,32 @@ kotlin {
         }
         binaries.executable()
     }
-    
+
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     jvm("desktop")
-    
+
     listOf(
         iosX64(),
         iosArm64(),
-        iosSimulatorArm64()
+        iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
         }
     }
-    
+
     sourceSets {
         val desktopMain by getting
-        
+
         androidMain.dependencies {
+            implementation("io.ktor:ktor-client-okhttp:2.3.0")
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
         }
@@ -67,6 +69,10 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(projects.shared)
+            implementation("io.ktor:ktor-client-core:2.3.0")
+            implementation("io.ktor:ktor-client-cio:2.3.0")
+            implementation("io.ktor:ktor-client-content-negotiation:2.3.0")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.0")
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

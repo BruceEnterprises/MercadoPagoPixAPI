@@ -21,7 +21,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 @Composable
 fun App() {
@@ -36,7 +44,6 @@ fun PaymentForm() {
     var email by remember { mutableStateOf("") }
     var cpf by remember { mutableStateOf("") }
     var responseText by remember { mutableStateOf("") }
-    var responseText2 by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
     Column(
@@ -47,12 +54,22 @@ fun PaymentForm() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (responseText2.isEmpty()) {
+        if (responseText.isNotEmpty()) {
+            Text(
+                text = responseText,
+                color = Color.Black,
+                textAlign = TextAlign.Start,
+                fontWeight = FontWeight.Normal,
+                fontSize = 18.sp,
+            )
+        }
+
+        if (responseText.isEmpty()) {
             Text(
                 text = "Atenção! Digite o CPF válido ou não será possível gerar a chave pix",
                 color = Color.Red,
                 textAlign = TextAlign.Start,
-                fontWeight = FontWeight.ExtraLight,
+                fontWeight = FontWeight.Normal,
                 fontSize = 16.sp,
             )
 
@@ -72,6 +89,9 @@ fun PaymentForm() {
 
             var isLoading by remember { mutableStateOf(false) }
 
+            @Serializable
+            data class PixPaymentRequest(val name: String, val email: String, val cpf: String)
+
             Button(
                 colors = ButtonDefaults.buttonColors(
                     contentColor = Color.Green,
@@ -79,11 +99,20 @@ fun PaymentForm() {
                 ),
                 onClick = {
                     scope.launch {
+                        val client = HttpClient {
+                            install(ContentNegotiation) {
+                                json()
+                            }
+                        }
                         isLoading = true
                         try {
-
+                            val pix = client.post("") {
+                                contentType(io.ktor.http.ContentType.Application.Json)
+                                setBody(PixPaymentRequest(name, email, cpf))
+                            }.body<String>()
+                            responseText = pix
                         } catch (e: Exception) {
-                            responseText2 = "Erro: ${e.message}"
+                            responseText = "Erro: ${e.message}"
                         } finally {
                             isLoading = false
                         }
@@ -104,7 +133,6 @@ fun PaymentForm() {
                 }
             }
         }
-
 
         Spacer(modifier = Modifier.height(16.dp))
     }
