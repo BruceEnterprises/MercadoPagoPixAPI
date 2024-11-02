@@ -39,7 +39,7 @@ fun Application.module() {
     }
     routing {
         get("/") {
-            call.respondText("<Hello World!>")
+            call.respondText("<Hello World!!>")
         }
         post("/pix") {
             var response = "teste mercado pago"

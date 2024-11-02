@@ -106,7 +106,7 @@ fun PaymentForm() {
                         }
                         isLoading = true
                         try {
-                            val pix = client.post("") {
+                            val pix = client.post("https://mediummercadopagoapi.rj.r.appspot.com/pix") {
                                 contentType(io.ktor.http.ContentType.Application.Json)
                                 setBody(PixPaymentRequest(name, email, cpf))
                             }.body<String>()
